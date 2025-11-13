@@ -1,0 +1,7 @@
+implementation("org.springframework.boot:spring-boot-starter-web") {
+    exclude group: "org.apache.tomcat.embed", module: "tomcat-embed-core"
+}
+
+implementation "org.apache.tomcat.embed:tomcat-embed-core:10.1.48"
+implementation "org.apache.tomcat.embed:tomcat-embed-el:10.1.48"
+implementation "org.apache.tomcat.embed:tomcat-embed-websocket:10.1.48"
