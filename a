@@ -1,7 +1,20 @@
-implementation("org.springframework.boot:spring-boot-starter-web") {
-    exclude group: "org.apache.tomcat.embed", module: "tomcat-embed-core"
-}
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == "org.apache.tomcat.embed") {
+            def tomcatModules = [
+                "tomcat-embed-core",
+                "tomcat-embed-websocket",
+                "tomcat-embed-el",
+                "tomcat-annotations-api"
+            ]
+            if (tomcatModules.contains(details.requested.name)) {
+                details.useVersion "10.1.49"
+            }
+        }
 
-implementation "org.apache.tomcat.embed:tomcat-embed-core:10.1.48"
-implementation "org.apache.tomcat.embed:tomcat-embed-el:10.1.48"
-implementation "org.apache.tomcat.embed:tomcat-embed-websocket:10.1.48"
+        if (details.requested.group == "jakarta.mail" &&
+            details.requested.name == "jakarta.mail-api") {
+            details.useVersion "2.1.3"
+        }
+    }
+}
