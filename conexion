@@ -1,0 +1,44 @@
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SshTunnelConfig {
+
+    private Session session;
+
+    @PostConstruct
+    public void initTunnel() {
+        try {
+            JSch jsch = new JSch();
+            session = jsch.getSession("ssh_user", "ssh_host", 22);
+            session.setPassword("ssh_password");
+
+            session.setConfig("StrictHostKeyChecking", "no");
+
+            session.connect();
+
+            // localPort -> remoteHost:remotePort
+            int assignedPort = session.setPortForwardingL(
+                    5433,         // puerto local que Spring Boot usará
+                    "localhost",  // host remoto donde está la BD
+                    5432          // puerto real de la BD
+            );
+
+            System.out.println("SSH tunnel established on local port: " + assignedPort);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating SSH Tunnel", e);
+        }
+    }
+
+    @PreDestroy
+    public void closeTunnel() {
+        if (session != null && session.isConnected()) {
+            session.disconnect();
+            System.out.println("SSH tunnel closed");
+        }
+    }
+}
