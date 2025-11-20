@@ -45,3 +45,5 @@ public class SshTunnelConfig {
 
 
 ssh -L 5433:1.1.1.1:5442 ssh_user@2.2.2.2
+
+ssh -v -L 5433:1.1.1.1:5442 ssh_user@2.2.2.2
