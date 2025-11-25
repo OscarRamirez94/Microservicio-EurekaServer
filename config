@@ -1,0 +1,37 @@
+catalogo:
+  prefijos:
+    "00": "A"
+    "01": "B"
+    "03": "C"
+
+
+@Configuration
+@ConfigurationProperties(prefix = "catalogo")
+public class CatalogoProperties {
+
+    private Map<String, String> prefijos;
+
+    public Map<String, String> getPrefijos() {
+        return prefijos;
+    }
+
+    public void setPrefijos(Map<String, String> prefijos) {
+        this.prefijos = prefijos;
+    }
+}
+
+@Service
+public class PrefijoService {
+
+    private final Map<String, String> prefijos;
+
+    public PrefijoService(CatalogoProperties properties) {
+        this.prefijos = properties.getPrefijos();
+    }
+
+    public String descripcionDesdeSerie(String serie) {
+        String prefijo = serie.substring(0, 2);
+        return prefijos.getOrDefault(prefijo, "DESCONOCIDO");
+    }
+}
+
