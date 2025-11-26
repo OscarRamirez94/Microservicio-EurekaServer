@@ -1,0 +1,70 @@
+catalogo:
+  codigos:
+    - codigo: "00"
+      titulo: "título1"
+      contexto: "contexto1"
+      tipo: "type1"
+    - codigo: "01"
+      titulo: "título2"
+      contexto: "contexto2"
+      tipo: "type2"
+    - codigo: "02"
+      titulo: "título3"
+      contexto: "contexto3"
+      tipo: "type3"
+
+public class CatalogoItem {
+    private String codigo;
+    private String titulo;
+    private String contexto;
+    private String tipo;
+
+    // getters y setters
+}
+
+@Component
+@ConfigurationProperties(prefix = "catalogo")
+public class CatalogoProperties {
+
+    private List<CatalogoItem> codigos;
+
+    public List<CatalogoItem> getCodigos() {
+        return codigos;
+    }
+
+    public void setCodigos(List<CatalogoItem> codigos) {
+        this.codigos = codigos;
+    }
+}
+
+@Service
+public class CatalogoService {
+
+    private final CatalogoProperties catalogoProperties;
+
+    public CatalogoService(CatalogoProperties catalogoProperties) {
+        this.catalogoProperties = catalogoProperties;
+    }
+
+    public CatalogoItem buscarPorCodigo(String linea20Digitos) {
+        String primeros2 = linea20Digitos.substring(0, 2);
+
+        return catalogoProperties.getCodigos().stream()
+                .filter(item -> item.getCodigo().equals(primeros2))
+                .findFirst()
+                .orElse(null);
+    }
+}
+
+@Autowired
+private CatalogoService catalogoService;
+
+public void ejemplo() {
+    String linea = "00123456789012345678";
+
+    CatalogoItem item = catalogoService.buscarPorCodigo(linea);
+
+    if (item != null) {
+        System.out.println(item.getTitulo());
+    }
+}
