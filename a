@@ -1,18 +1,22 @@
 import com.nimbusds.jwt.SignedJWT;
+import org.springframework.stereotype.Service;
 
-public class JwtUtils {
+@Service
+public class JwtMapperService {
 
-    public static void main(String[] args) throws Exception {
-        String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        
-        SignedJWT signedJWT = SignedJWT.parse(token);
+    public UserTokenInfo mapToUserTokenInfo(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            var claims = signedJWT.getJWTClaimsSet();
 
-        // Obtener claims
-        var claims = signedJWT.getJWTClaimsSet();
+            return UserTokenInfo.builder()
+                    .userId(claims.getSubject())                   // claim "sub"
+                    .email(claims.getStringClaim("email"))         // claim custom
+                    .roles(claims.getStringListClaim("roles"))     // claim custom
+                    .build();
 
-        System.out.println("Subject: " + claims.getSubject());
-        System.out.println("Issuer: " + claims.getIssuer());
-        System.out.println("Exp: " + claims.getExpirationTime());
-        System.out.println("Roles: " + claims.getStringListClaim("roles"));
+        } catch (Exception e) {
+            throw new RuntimeException("Error leyendo JWT", e);
+        }
     }
 }
