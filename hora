@@ -35,3 +35,23 @@ public static String normalizeIsoOffsetDate(String input) {
 
     return date.format(formatter);
 }
+
+
+
+public static String convertDate(String input) {
+
+    // 1. Parsear la fecha SIN zona
+    LocalDateTime localDateTime =
+            LocalDateTime.parse(input,
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+    // 2. Asignar el offset requerido (-06:00)
+    OffsetDateTime offsetDateTime =
+            localDateTime.atOffset(ZoneOffset.of("-06:00"));
+
+    // 3. Formatear con 9 dígitos de fracción
+    DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnXXX");
+
+    return offsetDateTime.format(formatter);
+}
