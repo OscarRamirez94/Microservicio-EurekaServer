@@ -23,3 +23,15 @@ public class FechaParser {
         System.out.println(result);
     }
 }
+
+
+
+
+public static String normalizeIsoOffsetDate(String input) {
+    OffsetDateTime date = OffsetDateTime.parse(input);
+
+    DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+    return date.format(formatter);
+}
