@@ -1,37 +1,25 @@
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
-String texto = "... FechaPago: 2025-12-10T16:09:53.392123-06:00 ...";
+public class FechaParser {
 
-Pattern pattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+-\\d{2}:\\d{2})");
-Matcher matcher = pattern.matcher(texto);
+    public static void main(String[] args) {
 
-String fechaPagoCompleta = null;
-if (matcher.find()) {
-    fechaPagoCompleta = matcher.group(1);
+        String input = "2025-13-11T18:09:53.3921123-06:00";
+
+        // Patrón REAL que viene del servicio (día y mes invertidos)
+        DateTimeFormatter inputFormatter =
+                DateTimeFormatter.ofPattern("yyyy-dd-MM'T'HH:mm:ss.SSSSSSSXXX");
+
+        OffsetDateTime parsedDate =
+                OffsetDateTime.parse(input, inputFormatter);
+
+        // Patrón ISO correcto de salida
+        DateTimeFormatter outputFormatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSXXX");
+
+        String result = parsedDate.format(outputFormatter);
+
+        System.out.println(result);
+    }
 }
-
-System.out.println(fechaPagoCompleta);
-
-
-
-import java.util.regex.*;
-
-String texto = "... FechaPago: 2025-12-10T16:09:53.392123-06:00 ...";
-
-Pattern pattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+)");
-Matcher matcher = pattern.matcher(texto);
-
-String fechaPago = null;
-if (matcher.find()) {
-    fechaPago = matcher.group(1);
-}
-
-System.out.println(fechaPago);
-
-
-String fecha = "2025-12-10 16:09:53.3921237";
-
-String fechaRecortada = fecha.replaceAll("(\\.\\d{6})\\d+", "$1");
-
-System.out.println(fechaRecortada);
