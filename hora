@@ -1,57 +1,17 @@
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class FechaParser {
-
+public class RegexFechaPago {
     public static void main(String[] args) {
 
-        String input = "2025-13-11T18:09:53.3921123-06:00";
+        String input = "Banca Móvil/FechaPago: 2025-12-22 22:44:15/CanalPago: Transferencia Electrónica de Fondos";
 
-        // Patrón REAL que viene del servicio (día y mes invertidos)
-        DateTimeFormatter inputFormatter =
-                DateTimeFormatter.ofPattern("yyyy-dd-MM'T'HH:mm:ss.SSSSSSSXXX");
+        Pattern pattern = Pattern.compile("FechaPago:\\s*(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2})");
+        Matcher matcher = pattern.matcher(input);
 
-        OffsetDateTime parsedDate =
-                OffsetDateTime.parse(input, inputFormatter);
-
-        // Patrón ISO correcto de salida
-        DateTimeFormatter outputFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSXXX");
-
-        String result = parsedDate.format(outputFormatter);
-
-        System.out.println(result);
+        if (matcher.find()) {
+            String fechaPago = matcher.group(1);
+            System.out.println(fechaPago);
+        }
     }
-}
-
-
-
-
-public static String normalizeIsoOffsetDate(String input) {
-    OffsetDateTime date = OffsetDateTime.parse(input);
-
-    DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
-    return date.format(formatter);
-}
-
-
-
-public static String convertDate(String input) {
-
-    // 1. Parsear la fecha SIN zona
-    LocalDateTime localDateTime =
-            LocalDateTime.parse(input,
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-    // 2. Asignar el offset requerido (-06:00)
-    OffsetDateTime offsetDateTime =
-            localDateTime.atOffset(ZoneOffset.of("-06:00"));
-
-    // 3. Formatear con 9 dígitos de fracción
-    DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnXXX");
-
-    return offsetDateTime.format(formatter);
 }
