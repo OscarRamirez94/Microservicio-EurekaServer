@@ -35,3 +35,18 @@ public class PrefijoService {
     }
 }
 
+
+
+
+
+Map<String, Object> response; // tu map principal
+
+List<Map<String, Object>> notifications =
+        (List<Map<String, Object>>) response.get("notifications");
+
+Map<String, Object> firstNotification = notifications.get(0);
+
+Map<String, Object> metadata =
+        (Map<String, Object>) firstNotification.get("metadata");
+
+String dpCode = (String) metadata.get("dp_code");
