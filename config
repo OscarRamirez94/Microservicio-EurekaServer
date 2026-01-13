@@ -50,3 +50,8 @@ Map<String, Object> metadata =
         (Map<String, Object>) firstNotification.get("metadata");
 
 String dpCode = (String) metadata.get("dp_code");
+
+
+
+
+String sinEntidades = raw.replaceAll("&amp;#\\d+;", "");
