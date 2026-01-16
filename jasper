@@ -1,0 +1,79 @@
+public class PdfRequestDTO {
+
+    private String reportName;
+    private Object data; // puede ser lista, objeto, etc.
+
+    // getters y setters
+}
+
+@RestController
+@RequestMapping("/api/v1/reports")
+public class PdfReportController {
+
+    private final PdfReportService pdfReportService;
+
+    public PdfReportController(PdfReportService pdfReportService) {
+        this.pdfReportService = pdfReportService;
+    }
+
+    @PostMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> generatePdf(@RequestBody PdfRequestDTO request) {
+
+        Map<String, Object> dataSource = new HashMap<>();
+        dataSource.put("REPORT_NAME", request.getReportName());
+        dataSource.put("DATA", request.getData());
+        dataSource.put("GENERATED_AT", LocalDateTime.now());
+
+        byte[] pdf = pdfReportService.generatePdf(dataSource);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=report.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+}
+
+public interface PdfReportService {
+
+    byte[] generatePdf(Map<String, Object> dataSource);
+}
+
+
+@Service
+public class PdfReportServiceImpl implements PdfReportService {
+
+    @Override
+    public byte[] generatePdf(Map<String, Object> dataSource) {
+
+        /*
+         * MAQUETA JASPER:
+         * Aquí solo dejamos la estructura típica.
+         * Tú luego conectas:
+         * - .jrxml
+         * - JasperCompileManager
+         * - JasperFillManager
+         * - JasperExportManager
+         */
+
+        try {
+            // Ejemplo de estructura real (comentada a propósito)
+
+            // JasperReport jasperReport =
+            //         JasperCompileManager.compileReport("path/to/template.jrxml");
+
+            // JRDataSource jrDataSource =
+            //         new JRBeanCollectionDataSource((Collection<?>) dataSource.get("DATA"));
+
+            // JasperPrint jasperPrint =
+            //         JasperFillManager.fillReport(jasperReport, dataSource, jrDataSource);
+
+            // return JasperExportManager.exportReportToPdf(jasperPrint);
+
+            // MOCK TEMPORAL
+            return new byte[0];
+
+        } catch (Exception e) {
+            throw new PdfGenerationException("Error generating PDF", e);
+        }
+    }
+}
