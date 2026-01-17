@@ -77,3 +77,48 @@ public class PdfReportServiceImpl implements PdfReportService {
         }
     }
 }
+
+
+
+
+
+
+
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+public class JasperReportService {
+
+    public JasperReport compileReport() throws JRException {
+        // Cargar el JRXML desde resources
+        InputStream jrxmlInput = new ClassPathResource("report_template.jrxml").getInputStream();
+
+        // Parsear el diseño del reporte
+        JasperDesign jasperDesign = JRXmlLoader.load(jrxmlInput);
+
+        // Compilar a JasperReport
+        return JasperCompileManager.compileReport(jasperDesign);
+    }
+
+    public JasperPrint fillReport(JasperReport jasperReport) throws JRException {
+        // Crear parámetros
+        Map<String, Object> params = new HashMap<>();
+
+        // DTO de ejemplo
+        Reporte reporte = new Reporte("123456");
+        params.put("report", reporte);
+
+        // Llenar el reporte sin datasource (solo parámetros)
+        return JasperFillManager.fillReport(jasperReport, params, new JREmptyDataSource());
+    }
+
+    public void exportPdf(JasperPrint jasperPrint, String outputPath) throws JRException {
+        JasperExportManager.exportReportToPdfFile(jasperPrint, outputPath);
+    }
+}
