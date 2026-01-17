@@ -1,183 +1,35 @@
-public class PdfRequestDTO {
-
-    private String reportName;
-    private Object data; // puede ser lista, objeto, etc.
-
-    // getters y setters
-}
-
-@RestController
-@RequestMapping("/api/v1/reports")
-public class PdfReportController {
-
-    private final PdfReportService pdfReportService;
-
-    public PdfReportController(PdfReportService pdfReportService) {
-        this.pdfReportService = pdfReportService;
-    }
-
-    @PostMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> generatePdf(@RequestBody PdfRequestDTO request) {
-
-        Map<String, Object> dataSource = new HashMap<>();
-        dataSource.put("REPORT_NAME", request.getReportName());
-        dataSource.put("DATA", request.getData());
-        dataSource.put("GENERATED_AT", LocalDateTime.now());
-
-        byte[] pdf = pdfReportService.generatePdf(dataSource);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=report.pdf")
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(pdf);
-    }
-}
-
-public interface PdfReportService {
-
-    byte[] generatePdf(Map<String, Object> dataSource);
-}
-
-
-@Service
-public class PdfReportServiceImpl implements PdfReportService {
-
-    @Override
-    public byte[] generatePdf(Map<String, Object> dataSource) {
-
-        /*
-         * MAQUETA JASPER:
-         * Aquí solo dejamos la estructura típica.
-         * Tú luego conectas:
-         * - .jrxml
-         * - JasperCompileManager
-         * - JasperFillManager
-         * - JasperExportManager
-         */
-
-        try {
-            // Ejemplo de estructura real (comentada a propósito)
-
-            // JasperReport jasperReport =
-            //         JasperCompileManager.compileReport("path/to/template.jrxml");
-
-            // JRDataSource jrDataSource =
-            //         new JRBeanCollectionDataSource((Collection<?>) dataSource.get("DATA"));
-
-            // JasperPrint jasperPrint =
-            //         JasperFillManager.fillReport(jasperReport, dataSource, jrDataSource);
-
-            // return JasperExportManager.exportReportToPdf(jasperPrint);
-
-            // MOCK TEMPORAL
-            return new byte[0];
-
-        } catch (Exception e) {
-            throw new PdfGenerationException("Error generating PDF", e);
-        }
-    }
-}
-
-
-
-
-
-
-
 import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.springframework.core.io.ClassPathResource;
+import net.sf.jasperreports.engine.util.JRSaver;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
-public class JasperReportService {
-
-    public JasperReport compileReport() throws JRException {
-        // Cargar el JRXML desde resources
-        InputStream jrxmlInput = new ClassPathResource("report_template.jrxml").getInputStream();
-
-        // Parsear el diseño del reporte
-        JasperDesign jasperDesign = JRXmlLoader.load(jrxmlInput);
-
-        // Compilar a JasperReport
-        return JasperCompileManager.compileReport(jasperDesign);
-    }
-
-    public JasperPrint fillReport(JasperReport jasperReport) throws JRException {
-        // Crear parámetros
-        Map<String, Object> params = new HashMap<>();
-
-        // DTO de ejemplo
-        Reporte reporte = new Reporte("123456");
-        params.put("report", reporte);
-
-        // Llenar el reporte sin datasource (solo parámetros)
-        return JasperFillManager.fillReport(jasperReport, params, new JREmptyDataSource());
-    }
-
-    public void exportPdf(JasperPrint jasperPrint, String outputPath) throws JRException {
-        JasperExportManager.exportReportToPdfFile(jasperPrint, outputPath);
-    }
-}
-
-
-
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-
-public class JasperCompiler {
+public class JasperCompileExample {
 
     public static void main(String[] args) {
         try {
-            // Ruta del archivo JRXML
-            String jrxmlPath = "src/main/resources/report_template.jrxml";
-            // Ruta donde se guardará el .jasper compilado
-            String jasperPath = "src/main/resources/report_template.jasper";
+            // 1️⃣ Ruta del JRXML de origen (desde C:\)
+            String jrxmlPath = "C:\\report_template.jrxml";
+            File jrxmlFile = new File(jrxmlPath);
+            if (!jrxmlFile.exists()) {
+                System.out.println("No se encontró el archivo JRXML: " + jrxmlPath);
+                return;
+            }
 
-            // Compilar y guardar el .jasper
-            JasperCompileManager.compileReportToFile(jrxmlPath, jasperPath);
+            // Abrir InputStream del JRXML
+            InputStream jrxmlInput = new FileInputStream(jrxmlFile);
 
-            System.out.println("Reporte compilado correctamente: " + jasperPath);
-        } catch (JRException e) {
-            e.printStackTrace();
-        }
-    }
-}
+            // 2️⃣ Compilar el JRXML en memoria
+            JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlInput);
 
+            // 3️⃣ Ruta de salida para el .jasper compilado
+            String jasperPath = "C:\\report_template.jasper";
 
-/////
-
-
-import net.sf.jasperreports.engine.*;
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.InputStream;
-
-public class JasperCompilerToDisk {
-
-    public static void main(String[] args) {
-        try {
-            // 1️⃣ Cargar JRXML desde resources
-            ClassPathResource resource = new ClassPathResource("report_template.jrxml");
-            InputStream jrxmlInput = resource.getInputStream();
-
-            // 2️⃣ Ruta de salida del .jasper (en C:)
-            String jasperPath = "C:\\report_template.jasper"; // Windows
-
-            // 3️⃣ Compilar y escribir el .jasper en disco
-            JasperCompileManager.compileReportToFile(jrxmlInput, jasperPath);
+            // Guardar el .jasper en disco
+            JRSaver.saveObject(jasperReport, jasperPath);
 
             System.out.println("Reporte compilado correctamente en: " + jasperPath);
-
-            // 4️⃣ Opcional: generar PDF de prueba
-            JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(jasperPath);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, new JREmptyDataSource());
-            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\report_output.pdf");
-
-            System.out.println("PDF generado correctamente en C:\\");
 
         } catch (JRException e) {
             e.printStackTrace();
