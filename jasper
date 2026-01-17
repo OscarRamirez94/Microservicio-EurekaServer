@@ -122,3 +122,27 @@ public class JasperReportService {
         JasperExportManager.exportReportToPdfFile(jasperPrint, outputPath);
     }
 }
+
+
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+
+public class JasperCompiler {
+
+    public static void main(String[] args) {
+        try {
+            // Ruta del archivo JRXML
+            String jrxmlPath = "src/main/resources/report_template.jrxml";
+            // Ruta donde se guardará el .jasper compilado
+            String jasperPath = "src/main/resources/report_template.jasper";
+
+            // Compilar y guardar el .jasper
+            JasperCompileManager.compileReportToFile(jrxmlPath, jasperPath);
+
+            System.out.println("Reporte compilado correctamente: " + jasperPath);
+        } catch (JRException e) {
+            e.printStackTrace();
+        }
+    }
+}
