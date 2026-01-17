@@ -146,3 +146,43 @@ public class JasperCompiler {
         }
     }
 }
+
+
+/////
+
+
+import net.sf.jasperreports.engine.*;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.InputStream;
+
+public class JasperCompilerToDisk {
+
+    public static void main(String[] args) {
+        try {
+            // 1️⃣ Cargar JRXML desde resources
+            ClassPathResource resource = new ClassPathResource("report_template.jrxml");
+            InputStream jrxmlInput = resource.getInputStream();
+
+            // 2️⃣ Ruta de salida del .jasper (en C:)
+            String jasperPath = "C:\\report_template.jasper"; // Windows
+
+            // 3️⃣ Compilar y escribir el .jasper en disco
+            JasperCompileManager.compileReportToFile(jrxmlInput, jasperPath);
+
+            System.out.println("Reporte compilado correctamente en: " + jasperPath);
+
+            // 4️⃣ Opcional: generar PDF de prueba
+            JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(jasperPath);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, new JREmptyDataSource());
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\report_output.pdf");
+
+            System.out.println("PDF generado correctamente en C:\\");
+
+        } catch (JRException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
